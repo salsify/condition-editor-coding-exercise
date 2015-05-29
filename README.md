@@ -13,6 +13,33 @@ In this exercise we would like to build a user interface that creates a filter a
 
 # Specification
 
+Your code should, given a set of property data:
+* Present a web user interface that allows the creation of filters of the form `[property name] [comparator] [property value]`
+* Updates a view of products to reflect the new criteria
+
+## Properties Types/Comparators
+
+Comparators define the relationship between properties and property values. Certain comparators are only valid for certain property types, valid comparators are defined as follows
+
+* string
+ * equals
+ * any
+ * none
+ * in
+* number
+ * equals
+ * greater_than
+ * less_than
+ * any
+ * none
+ * in
+* enumerated
+ * equals
+ * any
+ * none
+ * in
+
+
 ## Data
 
 We have provided you with a `datastore` with all the data you need to build your condition editor.
