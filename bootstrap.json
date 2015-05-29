@@ -1,0 +1,97 @@
+products: [
+  {
+    name: 'Headphones',
+    properties: [
+      color: 'black',
+      weight (oz): 5,
+      category: 'electronics'
+    ]
+  },
+  {
+    name: 'Cell Phone',
+    properties: [
+      color: 'black',
+      weight (oz): 3,
+      category: 'electronics'
+    ]
+  },
+  {
+    name: 'Keyboard',
+    properties: [
+      color: 'grey',
+      weight (oz): 5,
+      category: 'electronics'
+    ]
+  },
+  {
+    name: 'Cup',
+    properties: [
+      color: 'white',
+      weight (oz): 3,
+      category: 'kitchenware'
+    ]
+  },
+  {
+    name: 'Key',
+    properties: [
+      color: 'silver',
+      weight (oz): 1,
+      category: 'tools'
+    ]
+  },
+  {
+    name: 'Hammer',
+    properties: [
+      color: 'brown',
+      weight (oz): 19,
+      category: 'tools'
+    ]
+  }
+]
+
+properties: [
+  {
+    name: 'color',
+    type: 'string'
+  },
+  {
+    name: 'weight (oz)',
+    type: 'number'
+  },
+  {
+    name: 'category',
+    type: 'enumerated',
+    values: [
+      'tools',
+      'electronics',
+      'kitchenware'
+    ]
+  }
+]
+
+comparators: [
+  {
+    text: 'Equals',
+    id: 'equals'
+  },
+  {
+    text: 'Is greater than',
+    id: 'greater_than'
+  },
+  {
+    text: 'Is less than',
+    id: 'less_than'
+  },
+  {
+    text: 'Has Any Value',
+    id: 'any'
+  },
+  {
+    text: 'Has No Value',
+    id: 'none'
+  },
+  {
+    text 'Is any of'
+    id: 'in'
+  }
+]
