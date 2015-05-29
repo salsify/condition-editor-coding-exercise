@@ -19,7 +19,7 @@ Your code should, given a set of property data:
 
 ## Properties Types/Comparators
 
-Comparators define the relationship between properties and property values. Certain comparators are only valid for certain property types, valid comparators are defined as follows
+Comparators define the relationship between properties and property values. Certain comparators are only valid for certain property types, valid comparators for each property type are defined as follows:
 
 * string
  * equals
@@ -38,6 +38,10 @@ Comparators define the relationship between properties and property values. Cert
  * any
  * none
  * in
+
+## Views
+
+We recommend splitting the UI for this project into 2 views; one for the condition editor and one for the products list. The view responsible for the products list need only display some status for the current filter state, we are mainly interested in seeing how you design the condition editor and the interface between the views.
 
 
 ## Data
