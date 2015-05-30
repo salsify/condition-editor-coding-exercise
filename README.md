@@ -11,7 +11,7 @@ In order to create a filter condition a user must choose a property, an operatio
 
 To complete this exercise please build a user interface to create a filter and update a list of products to reflect the results. Use the exercise to demonstrate not only a solution to the problem but your approach to software design and testing.
 
-Provide us with an archive containing the results of your work and a README containing a guided tour of your work, notes on your development process, how long you spent on the exercise, what assumptions you made, etc.  If you wish this may also be presented as a live site.  In that case simply provide a link to the site and the README file mentioned above.
+Provide us with an archive containing the results of your work and a README file with a guided tour of your work, notes on your development process, how long you spent on the exercise, what assumptions you made, etc.  If you wish, this may also be presented as a live site.  In that case simply provide a link to the site and the README file mentioned above.
 
 # Specification
 
@@ -21,8 +21,8 @@ This repository contains a mock `datastore` which includes sample products, prop
 * Filters have the form `[property name] [comparator] [property value]`
 * Creating or updating a filter causes the the view of products to update
 
-# Non-requirements
-For the purpose of this exercise it is _not necessary to properly filter the products_. Simply demonstrating that the product list changes and that it has knowledge of the current filter is sufficient.
+# Recommendations / Non-requirements
+We recommend splitting the UI for this project into 2 views; one for the condition editor and one for the products list. The products list view in Salsify is reused in many places throughout the application both with and without the condition editor. For the purpose of this exercise **it is not necessary to properly filter the products**. Simply demonstrating that the product list changes and that it has knowledge of the current filter is sufficient. We are mainly interested in seeing how you design the condition editor and the interface between the views.
 
 ## Properties Types/Comparators
 
@@ -44,7 +44,3 @@ Comparators define the relationship between properties and property values. Cert
 | | any |
 | | none |
 | | in |
-
-## Recommendations
-
-We recommend splitting the UI for this project into 2 views; one for the condition editor and one for the products list. The view responsible for the products list need only display some status for the current filter state, we are mainly interested in seeing how you design the condition editor and the interface between the views.
