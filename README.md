@@ -9,7 +9,7 @@ In order to create filtered sets of products in Salsify we created a condition e
 
 In order to create a filter condition a user must choose a property, an operation, and one or more values. Due to the differences in property datatypes, not all operations apply to all properties.
 
-To complete this exercise please build a user interface to create a filter and update a list of products to reflect the results. Use the exercise to demonstrate not only a solution to the problem but your approach to software design and testing.
+To complete this exercise please build a user interface to create a filter and update a list of products to reflect the results. At Salsify we use both BackboneJS and EmberJS MVC frameworks. You may use any approach you deem appropriate. Use the exercise to demonstrate not only a solution to the problem but your approach to software design and testing.
 
 Provide us with an archive containing the results of your work and a README file with a guided tour of your work, notes on your development process, how long you spent on the exercise, what assumptions you made, etc.  If you wish, this may also be presented as a live site.  In that case simply provide a link to the site and the README file mentioned above.
 
