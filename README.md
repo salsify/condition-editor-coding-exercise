@@ -28,7 +28,7 @@ Comparators define the relationship between properties and property values. Cert
 
 
  | Property Type | Valid Operations |
- --------------------------------
+ | ---------------- | ---------------- |
  | string | equals (value exactly matches) |
  | | any (value is present) |
  | | none (value is absent) |
