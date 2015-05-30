@@ -1,4 +1,4 @@
-# condition-view-coding-exercise
+# A Product Filtering Condition Editor UI
 A Coding Exercise for UI Developers
 
 # Introduction
