@@ -26,23 +26,22 @@ For the purpose of this exercise it is _not necessary to properly filter the pro
 
 Comparators define the relationship between properties and property values. Certain comparators are only valid for certain property types, valid comparators for each property type are defined as follows:
 
-
- | Property Type | Valid Operations |
- | ---------------- | ---------------- |
- | string | equals (value exactly matches) |
- | | any (value is present) |
- | | none (value is absent) |
- | | in (value exactly matches one of several values)|
- | number | equals |
- | | greater_than |
- | | less_than |
- | | any |
- | | none |
- | | in |
- | enumerated | equals |
- | | any |
- | | none |
- | | in |
+| Property Type | Valid Operations |
+---------------- | ----------------
+| string | equals (value exactly matches) |
+| | any (value is present) |
+| | none (value is absent) |
+| | in (value exactly matches one of several values)|
+| number | equals |
+| | greater_than |
+| | less_than |
+| | any |
+| | none |
+| | in |
+| enumerated | equals |
+| | any |
+| | none |
+| | in |
 
 ## Recommendations
 
