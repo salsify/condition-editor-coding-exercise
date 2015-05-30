@@ -1,4 +1,4 @@
-# A Product Filtering Condition Editor UI
+# Product Filtering Condition Editor UI
 A Coding Exercise for UI Developers
 
 # Introduction
