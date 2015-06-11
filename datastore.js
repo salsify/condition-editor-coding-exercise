@@ -7,8 +7,8 @@ window.datastore = {
     return this.properties;
   },
 
-  getComparators: function() {
-    return this.comparators;
+  getOperators: function() {
+    return this.operators;
   },
 
   products: [
@@ -29,6 +29,10 @@ window.datastore = {
         {
           name: 'category',
           value: 'electronics'
+        },
+        {
+          name: 'wireless',
+          value: 'false'
         }
       ]
     },
@@ -49,6 +53,10 @@ window.datastore = {
         {
           name: 'category',
           value: 'electronics'
+        },
+        {
+          name: 'wireless',
+          value: 'true'
         }
       ]
     },
@@ -69,6 +77,10 @@ window.datastore = {
         {
           name: 'category',
           value: 'electronics'
+        },
+        {
+          name: 'wireless',
+          value: 'false'
         }
       ]
     },
@@ -136,6 +148,10 @@ window.datastore = {
 
   properties: [
     {
+      name: 'Product Name',
+      type: 'string'
+    },
+    {
       name: 'color',
       type: 'string'
     },
@@ -151,10 +167,18 @@ window.datastore = {
         'electronics',
         'kitchenware'
       ]
+    },
+    {
+      name: 'wireless',
+      type: 'enumerated',
+      values: [
+        'true',
+        'false'
+      ]
     }
   ],
 
-  comparators: [
+  operators: [
     {
       text: 'Equals',
       id: 'equals'

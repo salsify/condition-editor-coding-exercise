@@ -15,7 +15,7 @@ Provide us with an archive containing the results of your work and a README file
 
 # Specification
 
-This repository contains a mock `datastore` which includes sample products, propderty definitions including data types, and the complete set of filter operations. Using this datastore please create a web user inteface with the following behavior:
+This repository contains a mock `datastore` which includes sample products, property definitions including data types, and the complete set of filter operations. Using this datastore please create a web user inteface with the following behavior:
 
 * A user can create a single filter
 * Filters have the form `[property name] [operator] [property value]`
@@ -26,14 +26,24 @@ We recommend splitting the UI for this project into 2 views; one for the conditi
 
 ## Properties Types/Operators
 
-Operators define the relationship between properties and property values. Certain operators are only valid for certain property types, valid operators for each property type are defined as follows:
+Operators define the relationship between properties and property values. Certain operators are only valid for certain property types, operator behavior and valid operators for each property type are defined as follows:
+
+| Operator | Description |
+-----------|--------------
+| Equals   | Value exactly matches |
+| Is greater than | Value is greater than |
+| Is less than  | Value is less than |
+| Has Any Value | Value is present |
+| Has No Value  | Value is absent  |
+| Is Any of     | Value exactly matches one of several values |
+
 
 | Property Type | Valid Operators |
 ---------------- | ----------------
-| string | equals (value exactly matches) |
-| | any (value is present) |
-| | none (value is absent) |
-| | in (value exactly matches one of several values)|
+| string | equals |
+| | any |
+| | none |
+| | in |
 | number | equals |
 | | greater_than |
 | | less_than |
