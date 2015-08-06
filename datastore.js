@@ -13,6 +13,7 @@ window.datastore = {
 
   products: [
     {
+      id: 0,
       properties: [
         {
           name: 'Product Name',
@@ -37,6 +38,7 @@ window.datastore = {
       ]
     },
     {
+      id: 1,
       properties: [
         {
           name: 'Product Name',
@@ -61,6 +63,7 @@ window.datastore = {
       ]
     },
     {
+      id: 2,
       properties: [
         {
           name: 'Product Name',
@@ -85,6 +88,7 @@ window.datastore = {
       ]
     },
     {
+      id: 3,
       properties: [
         {
           name: 'Product Name',
@@ -105,6 +109,7 @@ window.datastore = {
       ]
     },
     {
+      id: 4,
       properties: [
         {
           name: 'Product Name',
@@ -125,6 +130,7 @@ window.datastore = {
       ]
     },
     {
+      id: 5,
       properties: [
         {
           name: 'Product Name',
@@ -148,18 +154,22 @@ window.datastore = {
 
   properties: [
     {
+      id: 0,
       name: 'Product Name',
       type: 'string'
     },
     {
+      id: 1,
       name: 'color',
       type: 'string'
     },
     {
+      id: 2,
       name: 'weight (oz)',
       type: 'number'
     },
     {
+      id: 3,
       name: 'category',
       type: 'enumerated',
       values: [
@@ -169,6 +179,7 @@ window.datastore = {
       ]
     },
     {
+      id: 4,
       name: 'wireless',
       type: 'enumerated',
       values: [
