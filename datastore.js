@@ -14,25 +14,25 @@ window.datastore = {
   products: [
     {
       id: 0,
-      properties: [
+      property_values: [
         {
-          name: 'Product Name',
+          property_id: 0
           value: 'Headphones'
         },
         {
-          name: 'color',
+          property_id: 1,
           value: 'black'
         },
         {
-          name: 'weight (oz)',
+          property_id: 2,
           value: 5
         },
         {
-          name: 'category',
+          property_id: 3,
           value: 'electronics'
         },
         {
-          name: 'wireless',
+          property_id: 4,
           value: 'false'
         }
       ]
@@ -41,23 +41,23 @@ window.datastore = {
       id: 1,
       properties: [
         {
-          name: 'Product Name',
+          property_id: 0,
           value: 'Cell Phone'
         },
         {
-          name: 'color',
+          property_id: 1,
           value: 'black'
         },
         {
-          name: 'weight (oz)',
+          property_id: 2,
           value: 3
         },
         {
-          name: 'category',
+          property_id: 3,
           value: 'electronics'
         },
         {
-          name: 'wireless',
+          property_id: 4,
           value: 'true'
         }
       ]
@@ -66,23 +66,23 @@ window.datastore = {
       id: 2,
       properties: [
         {
-          name: 'Product Name',
+          property_id: 0,
           value: 'Keyboard'
         },
         {
-          name: 'color',
+          property_id: 1,
           value: 'grey'
         },
         {
-          name: 'weight (oz)',
+          property_id: 2,
           value: 5
         },
         {
-          name: 'category',
+          property_id: 3,
           value: 'electronics'
         },
         {
-          name: 'wireless',
+          property_id: 4,
           value: 'false'
         }
       ]
@@ -91,19 +91,19 @@ window.datastore = {
       id: 3,
       properties: [
         {
-          name: 'Product Name',
+          property_id: 0,
           value: 'Cup'
         },
         {
-          name: 'color',
+          property_id: 1,
           value: 'white'
         },
         {
-          name: 'weight (oz)',
+          property_id: 2,
           value: 3
         },
         {
-          name: 'category',
+          property_id: 3,
           value: 'kitchenware'
         }
       ]
@@ -112,19 +112,19 @@ window.datastore = {
       id: 4,
       properties: [
         {
-          name: 'Product Name',
+          property_id: 0,
           value: 'Key'
         },
         {
-          name: 'color',
+          property_id: 1,
           value: 'silver'
         },
         {
-          name: 'weight (oz)',
+          property_id: 2,
           value: 1
         },
         {
-          name: 'category',
+          property_id: 3,
           value: 'tools'
         }
       ]
@@ -133,19 +133,19 @@ window.datastore = {
       id: 5,
       properties: [
         {
-          name: 'Product Name',
+          property_id: 0,
           value: 'Hammer'
         },
         {
-          name: 'color',
+          property_id: 1,
           value: 'brown'
         },
         {
-          name: 'weight (oz)',
+          property_id: 2,
           value: 19
         },
         {
-          name: 'category',
+          property_id: 3,
           value: 'tools'
         }
       ]
@@ -203,16 +203,20 @@ window.datastore = {
       id: 'less_than'
     },
     {
-      text: 'Has Any Value',
+      text: 'Has any value',
       id: 'any'
     },
     {
-      text: 'Has No Value',
+      text: 'Has no value',
       id: 'none'
     },
     {
       text: 'Is any of',
       id: 'in'
+    },
+    {
+      text: 'Contains',
+      id: 'contains'
     }
   ]
 }
