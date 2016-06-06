@@ -5,7 +5,7 @@ A Coding Exercise for UI Developers
 
 Many capabilities of Salsify are built around filtered sets of products. Products at Salsify consist of properties and their values. Properties have a datatype.
 
-In order to create filtered sets of products in Salsify we created a condition editor. This editor is used to build a filter that Salsify applies to the full set of products. The resulting set of products, presented in a product index view, is updated as filters are added or changed.
+In order to create filtered sets of products in Salsify we created a condition editor. This editor is used to build a filter that Salsify applies to the full set of products. The resulting set of products, presented as a list, is updated as filters are added or changed.
 
 In order to create a filter condition a user must choose a property, an operation, and one or more values. Due to the differences in property datatypes, not all operations apply to all properties.
 
@@ -19,7 +19,7 @@ This repository contains a mock `datastore` which includes sample products, prop
 
 * A user can create a single filter
 * Filters have the form `[property name] [operator] [property value]`
-* Creating or updating a filter causes the the view of products to update
+* Creating or updating a filter causes the the list of products to update
 
 # Tips and Recommendations
 - No other Operators will be introduced, but Products and Properties are dynamic, they may be added or removed in the future.
@@ -36,6 +36,7 @@ Operators define the relationship between properties and property values. Certai
 | Has any value | Value is present |
 | Has no value  | Value is absent  |
 | Is any of     | Value exactly matches one of several values |
+| Contains      | Value contains the specified text |
 
 
 | Property Type | Valid Operators |
@@ -44,6 +45,7 @@ Operators define the relationship between properties and property values. Certai
 | | Has any value |
 | | Has no value |
 | | Is any of |
+| | Contains |
 | number | Equals |
 | | Is greater than |
 | | Is less than |

@@ -213,6 +213,10 @@ window.datastore = {
     {
       text: 'Is any of',
       id: 'in'
+    },
+    {
+      text: 'Contains',
+      id: 'contains'
     }
   ]
 }
