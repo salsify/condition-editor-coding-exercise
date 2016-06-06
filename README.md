@@ -22,7 +22,7 @@ This repository contains a mock `datastore` which includes sample products, prop
 * Creating or updating a filter causes the the list of products to update
 
 # Tips and Recommendations
-- No other Operators or data types will be introduced, they are static.
+- No other Operators or data types will be introduced; they are static.
 - Properties and Products vary from customer to customer, you cannot depend on having the same properties or products available each time this application loads
 
 ## Properties Types/Operators
