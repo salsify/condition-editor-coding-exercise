@@ -32,16 +32,16 @@
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
         <h1>
-<a id="product-filtering-condition-editor-ui" class="anchor" href="#product-filtering-condition-editor-ui" aria-hidden="true"><span class="octicon octicon-link"></span></a>Product Filtering Condition Editor UI</h1>
+<a id="product-filtering-condition-editor-ui" class="anchor" href="#product-filtering-condition-editor-ui" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Product Filtering Condition Editor UI</h1>
 
 <p>A Coding Exercise for UI Developers</p>
 
 <h1>
-<a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span class="octicon octicon-link"></span></a>Introduction</h1>
+<a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Introduction</h1>
 
-<p>Many capabilites of Salsify are built around filtered sets of products. Products at Salsify consist of properties and their values. Properties have a datatype.</p>
+<p>Many capabilities of Salsify are built around filtered sets of products. Products at Salsify consist of properties and their values. Properties have a datatype.</p>
 
-<p>In order to create filtered sets of products in Salsify we created a condition editor. This editor is used to build a filter that Salsify applies to the full set of products. The resulting set of products, presented in a product index view, is updated as filters are added or changed.</p>
+<p>In order to create filtered sets of products in Salsify we created a condition editor. This editor is used to build a filter that Salsify applies to the full set of products. The resulting set of products, presented as a list, is updated as filters are added or changed.</p>
 
 <p>In order to create a filter condition a user must choose a property, an operation, and one or more values. Due to the differences in property datatypes, not all operations apply to all properties.</p>
 
@@ -50,26 +50,68 @@
 <p>Provide us with an archive containing the results of your work and a README file with a guided tour of your work, notes on your development process, how long you spent on the exercise, what assumptions you made, etc.  If you wish, this may also be presented as a live site.  In that case simply provide a link to the site and the README file mentioned above.</p>
 
 <h1>
-<a id="specification" class="anchor" href="#specification" aria-hidden="true"><span class="octicon octicon-link"></span></a>Specification</h1>
+<a id="specification" class="anchor" href="#specification" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Specification</h1>
 
-<p>This repository contains a mock <code>datastore</code> which includes sample products, propderty definitions including data types, and the complete set of filter operations. Using this datastore please create a web user inteface with the following behavior:</p>
+<p>This repository contains a mock <code>datastore</code> which includes sample products, property definitions including data types, and the complete set of filter operations. Using this datastore please create a web user interface with the following behavior:</p>
 
 <ul>
 <li>A user can create a single filter</li>
 <li>Filters have the form <code>[property name] [operator] [property value]</code>
 </li>
-<li>Creating or updating a filter causes the the view of products to update</li>
+<li>Creating or updating a filter causes the the list of products to update</li>
 </ul>
 
 <h1>
-<a id="recommendations--non-requirements" class="anchor" href="#recommendations--non-requirements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Recommendations / Non-requirements</h1>
+<a id="tips-and-recommendations" class="anchor" href="#tips-and-recommendations" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Tips and Recommendations</h1>
 
-<p>We recommend splitting the UI for this project into 2 views; one for the condition editor and one for the products list. The products list view in Salsify is reused in many places throughout the application both with and without the condition editor. For the purpose of this exercise <strong>it is not necessary to properly filter the products</strong>. Simply demonstrating that the product list changes and that it has knowledge of the current filter is sufficient. We are mainly interested in seeing how you design the condition editor and the interface between the views.</p>
+<ul>
+<li>No other Operators or data types will be introduced; they are static.</li>
+<li>Properties and Products vary from customer to customer, you cannot depend on having the same properties or products available each time this application loads</li>
+</ul>
 
 <h2>
-<a id="properties-typesoperators" class="anchor" href="#properties-typesoperators" aria-hidden="true"><span class="octicon octicon-link"></span></a>Properties Types/Operators</h2>
+<a id="properties-typesoperators" class="anchor" href="#properties-typesoperators" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Properties Types/Operators</h2>
 
-<p>Operators define the relationship between properties and property values. Certain operators are only valid for certain property types, valid operators for each property type are defined as follows:</p>
+<p>Operators define the relationship between properties and property values. Certain operators are only valid for certain property types, operator behavior and valid operators for each property type are defined as follows:</p>
+
+<table>
+<thead>
+<tr>
+<th>Operator</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Equals</td>
+<td>Value exactly matches</td>
+</tr>
+<tr>
+<td>Is greater than</td>
+<td>Value is greater than</td>
+</tr>
+<tr>
+<td>Is less than</td>
+<td>Value is less than</td>
+</tr>
+<tr>
+<td>Has any value</td>
+<td>Value is present</td>
+</tr>
+<tr>
+<td>Has no value</td>
+<td>Value is absent</td>
+</tr>
+<tr>
+<td>Is any of</td>
+<td>Value exactly matches one of several values</td>
+</tr>
+<tr>
+<td>Contains</td>
+<td>Value contains the specified text</td>
+</tr>
+</tbody>
+</table>
 
 <table>
 <thead>
@@ -81,43 +123,47 @@
 <tbody>
 <tr>
 <td>string</td>
-<td>equals (value exactly matches)</td>
+<td>Equals</td>
 </tr>
 <tr>
 <td></td>
-<td>any (value is present)</td>
+<td>Has any value</td>
 </tr>
 <tr>
 <td></td>
-<td>none (value is absent)</td>
+<td>Has no value</td>
 </tr>
 <tr>
 <td></td>
-<td>in (value exactly matches one of several values)</td>
+<td>Is any of</td>
+</tr>
+<tr>
+<td></td>
+<td>Contains</td>
 </tr>
 <tr>
 <td>number</td>
-<td>equals</td>
+<td>Equals</td>
 </tr>
 <tr>
 <td></td>
-<td>greater_than</td>
+<td>Is greater than</td>
 </tr>
 <tr>
 <td></td>
-<td>less_than</td>
+<td>Is less than</td>
 </tr>
 <tr>
 <td></td>
-<td>any</td>
+<td>Has any value</td>
 </tr>
 <tr>
 <td></td>
-<td>none</td>
+<td>Has no value</td>
 </tr>
 <tr>
 <td></td>
-<td>in</td>
+<td>Is any of</td>
 </tr>
 <tr>
 <td>enumerated</td>
@@ -125,15 +171,15 @@
 </tr>
 <tr>
 <td></td>
-<td>any</td>
+<td>Has any value</td>
 </tr>
 <tr>
 <td></td>
-<td>none</td>
+<td>Has no value</td>
 </tr>
 <tr>
 <td></td>
-<td>in</td>
+<td>Is any of</td>
 </tr>
 </tbody>
 </table>
