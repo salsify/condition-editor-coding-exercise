@@ -16,7 +16,7 @@ window.datastore = {
       id: 0,
       property_values: [
         {
-          property_id: 0
+          property_id: 0,
           value: 'Headphones'
         },
         {
@@ -39,7 +39,7 @@ window.datastore = {
     },
     {
       id: 1,
-      properties: [
+      property_values: [
         {
           property_id: 0,
           value: 'Cell Phone'
@@ -64,7 +64,7 @@ window.datastore = {
     },
     {
       id: 2,
-      properties: [
+      property_values: [
         {
           property_id: 0,
           value: 'Keyboard'
@@ -89,7 +89,7 @@ window.datastore = {
     },
     {
       id: 3,
-      properties: [
+      property_values: [
         {
           property_id: 0,
           value: 'Cup'
@@ -110,7 +110,7 @@ window.datastore = {
     },
     {
       id: 4,
-      properties: [
+      property_values: [
         {
           property_id: 0,
           value: 'Key'
@@ -131,7 +131,7 @@ window.datastore = {
     },
     {
       id: 5,
-      properties: [
+      property_values: [
         {
           property_id: 0,
           value: 'Hammer'
