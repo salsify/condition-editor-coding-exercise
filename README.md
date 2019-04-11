@@ -60,3 +60,19 @@ Operators define the relationship between properties and property values. Certai
 | | Has any value |
 | | Has no value |
 | | Is any of |
+
+### Examples
+
+Here are some example property & input combinations and a description of their expected output. This table is meant to further clarify the expected behavior of the aforementioned operators.
+
+| Operator | Example Property | Example Value | Expected Output |
+| -------- | ---------------- | ------------------- | --------------- |
+| Equals | `Name` | `Headphones` | Products where `Name` is exactly `Headphones` |
+| Is greater than | `Price` | `20` | Products where the `Price` > `20` |
+| Is less than | `Price` | `20` | Products where `Price` < `20` |
+| Has any value | `Description` | --- | Products where `Description` is defined/is NOT null |
+| Has no value | `Description` | --- | Products where the `Description` is not defined/IS null |
+| Is any of | `Name` | `Headphones, Keys` | Products where the Name is either exactly `Headphones` OR exactly `Keys` |
+| Contains | `Name` | `phone` | Products where the Name string CONTAINS `phone` (e.g. `Headphones`, `Telephone`, `Cell Phone`, `Phone`) |
+
+
