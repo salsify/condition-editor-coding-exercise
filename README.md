@@ -73,6 +73,6 @@ Here are some example property & input combinations and a description of their e
 | Has any value | `Description` | --- | Products where `Description` is defined/is NOT null |
 | Has no value | `Description` | --- | Products where the `Description` is not defined/IS null |
 | Is any of | `Name` | `Headphones, Keys` | Products where the Name is either exactly `Headphones` OR exactly `Keys` |
-| Contains | `Name` | `phone` | Products where the Name string CONTAINS `phone` (e.g. `Headphones`, `Telephone`) |
+| Contains | `Name` | `phone` | Products where the Name string CONTAINS `phone` (e.g. `Headphones`, `Telephone`, `Cell Phone`, `Phone`) |
 
 
