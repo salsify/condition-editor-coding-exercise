@@ -186,6 +186,70 @@
 </tr>
 </tbody>
 </table>
+
+<h2>
+  <a id="properties-typesoperators-examples" class="anchor" href="#properties-typesoperators-examples" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Examples
+</h2>
+
+<p>
+  Here are some example property & input combinations and a description of their expected output. This table is meant to further clarify the expected behavior of the aforementioned operators.
+</p>
+
+<table>
+<thead>
+<tr>
+<th>Operator</th>
+<th>Example Property</th>
+<th>Example Value</th>
+<th>Expected Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Equals</td>
+<td><code>Name</code></td>
+<td><code>Headphones</code></td>
+<td>Products where <code>Name</code> is exactly <code>Headphones</code></td>
+</tr>
+<tr>
+<td>Is greater than</td>
+<td><code>Price</code></td>
+<td><code>20</code></td>
+<td>Products where <code>Price</code> > <code>20</code></td>
+</tr>
+<tr>
+<td>Is less than</td>
+<td><code>Price</code></td>
+<td><code>20</code></td>
+<td>Products where <code>Price</code> < <code>20</code></td>
+</tr>
+<tr>
+<td>Has any value</td>
+<td><code>Description</code></td>
+<td>---</td>
+<td>Products where <code>Description</code> is defined/is NOT null</td>
+</tr>
+<tr>
+<td>Has no value</td>
+<td><code>Description</code></td>
+<td>---</td>
+<td>Products where <code>Description</code> is not defined/IS null</td>
+</tr>
+<tr>
+<td>Is any of</td>
+<td><code>Name</code></td>
+<td><code>Headphones, Keys</code></td>
+<td>Products where the Name is either exactly <code>Headphones</code> OR exactly <code>Keys</code></td>
+</tr>
+<tr>
+<td>Contains</td>
+<td><code>Name</code></td>
+<td><code>phone</code></td>
+<td>Products where the Name string CONTAINS <code>phone</code> (e.g. <code>Headphones</code>, <code>Telephone</code>, <code>Cell Phone</code>, <code>Phone</code>)</td>
+</tr>
+</tbody>
+</table>
+
       </section>
     </div>
 
@@ -196,8 +260,6 @@
         <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
       </footer>
     </div>
-
-    
 
   </body>
 </html>
