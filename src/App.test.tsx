@@ -143,6 +143,10 @@ describe("App", () => {
     );
 
     expect(screen.queryByLabelText("Value")).not.toBeInTheDocument();
+    // The "Value" field label itself must also be gone — not just its
+    // input — so there's no orphaned "Value" text left dangling above a
+    // hidden input.
+    expect(screen.queryByText("Value")).not.toBeInTheDocument();
     expect(getProductNames().sort()).toEqual(
       ["Cell Phone", "Headphones", "Keyboard"].sort(),
     );
@@ -151,6 +155,7 @@ describe("App", () => {
       screen.getByRole("combobox", { name: "Operator" }),
       "Has no value",
     );
+    expect(screen.queryByText("Value")).not.toBeInTheDocument();
     expect(getProductNames().sort()).toEqual(["Cup", "Hammer", "Key"].sort());
   });
 
@@ -231,6 +236,93 @@ describe("App", () => {
     expect(
       screen.queryByRole("combobox", { name: "Operator" }),
     ).not.toBeInTheDocument();
+  });
+
+  it("allows typing a comma-separated list into a string 'Is any of' value, including mid-typing commas", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await waitForCatalog();
+
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Property" }),
+      "Product Name",
+    );
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Operator" }),
+      "Is any of",
+    );
+
+    const valueInput = screen.getByRole("textbox", { name: "Value" });
+    await user.type(valueInput, "Headphones,");
+
+    // The trailing comma the user just typed must still be visible — it
+    // must not be silently stripped mid-typing, which is what made typing
+    // a second value look impossible.
+    expect(valueInput).toHaveValue("Headphones,");
+
+    await user.type(valueInput, " Key");
+    expect(valueInput).toHaveValue("Headphones, Key");
+
+    expect(getProductNames().sort()).toEqual(["Headphones", "Key"].sort());
+  });
+
+  it("allows typing a comma-separated list into a number 'Is any of' value, including mid-typing commas", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await waitForCatalog();
+
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Property" }),
+      "weight (oz)",
+    );
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Operator" }),
+      "Is any of",
+    );
+
+    const valueInput = screen.getByRole("textbox", { name: "Value" });
+    await user.type(valueInput, "5,");
+
+    expect(valueInput).toHaveValue("5,");
+
+    await user.type(valueInput, " 1");
+    expect(valueInput).toHaveValue("5, 1");
+
+    expect(getProductNames().sort()).toEqual(
+      ["Headphones", "Keyboard", "Key"].sort(),
+    );
+  });
+
+  it("resets the 'Is any of' free-text value when switching operators or properties", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await waitForCatalog();
+
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Property" }),
+      "Product Name",
+    );
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Operator" }),
+      "Is any of",
+    );
+    await user.type(
+      screen.getByRole("textbox", { name: "Value" }),
+      "Headphones, Key",
+    );
+
+    // Switching away and back to "Is any of" should not carry over the
+    // previous free text (the condition's value was reset to undefined).
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Operator" }),
+      "Contains",
+    );
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Operator" }),
+      "Is any of",
+    );
+
+    expect(screen.getByRole("textbox", { name: "Value" })).toHaveValue("");
   });
 
   it("restores the full list when a completed condition is changed back to an incomplete one", async () => {

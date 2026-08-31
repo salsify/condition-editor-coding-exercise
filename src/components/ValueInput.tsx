@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { OperatorId, Property } from "../api/types";
 import type { ConditionValue } from "../domain/filter";
 
@@ -24,6 +25,10 @@ function parseNumberList(text: string): number[] {
     .filter((n) => !Number.isNaN(n));
 }
 
+function formatList(value: ConditionValue): string {
+  return Array.isArray(value) ? value.join(", ") : "";
+}
+
 /**
  * Renders the value input appropriate for the selected property's data
  * type and operator: no input for `any`/`none`, a `<select>` (or a
@@ -37,6 +42,17 @@ export function ValueInput({
   value,
   onChange,
 }: ValueInputProps) {
+  // Backing state for the `in` operator's free-text, comma-separated list
+  // inputs (number and string). The displayed text must be the raw string
+  // the user is typing, not a re-join of the already-parsed value array —
+  // parsing drops empty segments (trailing/in-progress commas, stray
+  // spaces), so deriving the input's `value` from the parsed array instead
+  // of from this local state would erase a comma the instant it's typed,
+  // making it look impossible to enter more than one value. `ConditionEditor`
+  // remounts this component (via `key`) whenever the property or operator
+  // changes, so this only needs to seed itself once per condition.
+  const [listText, setListText] = useState(() => formatList(value));
+
   if (operatorId === "any" || operatorId === "none") {
     return null;
   }
@@ -92,14 +108,16 @@ export function ValueInput({
 
   if (property.type === "number") {
     if (operatorId === "in") {
-      const text = Array.isArray(value) ? value.join(", ") : "";
       return (
         <input
           type="text"
           aria-label="Value"
           placeholder="e.g. 3, 5, 19"
-          value={text}
-          onChange={(e) => onChange(parseNumberList(e.target.value))}
+          value={listText}
+          onChange={(e) => {
+            setListText(e.target.value);
+            onChange(parseNumberList(e.target.value));
+          }}
         />
       );
     }
@@ -117,14 +135,16 @@ export function ValueInput({
 
   // string
   if (operatorId === "in") {
-    const text = Array.isArray(value) ? value.join(", ") : "";
     return (
       <input
         type="text"
         aria-label="Value"
         placeholder="e.g. Headphones, Keyboard"
-        value={text}
-        onChange={(e) => onChange(parseStringList(e.target.value))}
+        value={listText}
+        onChange={(e) => {
+          setListText(e.target.value);
+          onChange(parseStringList(e.target.value));
+        }}
       />
     );
   }

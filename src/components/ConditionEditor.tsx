@@ -1,6 +1,6 @@
 import type { Operator, OperatorId, Property } from "../api/types";
 import type { Condition, ConditionValue } from "../domain/filter";
-import { getValidOperatorIds } from "../domain/operators";
+import { getValidOperatorIds, operatorTakesValue } from "../domain/operators";
 import { ValueInput } from "./ValueInput";
 
 interface ConditionEditorProps {
@@ -100,17 +100,25 @@ export function ConditionEditor({
         </label>
       )}
 
-      {selectedProperty && condition && (
-        <div className="condition-editor__field">
-          <span>Value</span>
-          <ValueInput
-            property={selectedProperty}
-            operatorId={condition.operatorId}
-            value={condition.value}
-            onChange={handleValueChange}
-          />
-        </div>
-      )}
+      {selectedProperty &&
+        condition &&
+        operatorTakesValue(condition.operatorId) && (
+          <div className="condition-editor__field">
+            <span>Value</span>
+            <ValueInput
+              // Remount whenever the property or operator changes so
+              // ValueInput's internal free-text state (for the `in`
+              // operator's comma-separated list inputs) starts fresh
+              // instead of carrying over text from a different
+              // property/operator.
+              key={`${selectedProperty.id}-${condition.operatorId}`}
+              property={selectedProperty}
+              operatorId={condition.operatorId}
+              value={condition.value}
+              onChange={handleValueChange}
+            />
+          </div>
+        )}
 
       <button type="button" onClick={onClear} disabled={!condition}>
         Clear filter
