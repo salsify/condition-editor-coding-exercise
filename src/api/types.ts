@@ -46,8 +46,31 @@ export interface Operator {
   text: string;
 }
 
+/**
+ * The shape of the mock dataset in `src/mocks/data.ts` — no longer what a
+ * single query returns (see `ReferenceData` and the `products` query
+ * below), just a convenient bundle the MSW handlers slice per-operation.
+ */
 export interface CatalogData {
   properties: Property[];
   operators: Operator[];
   products: Product[];
+}
+
+/** What the `ReferenceData` query returns: static, fetched once. */
+export interface ReferenceData {
+  properties: Property[];
+  operators: Operator[];
+}
+
+/**
+ * The `condition` variable for the `products(condition: ConditionInput)`
+ * query — structurally the same shape as `domain/filter`'s `Condition`,
+ * kept as an independent type here (rather than imported) since `domain/`
+ * already imports from `api/types` and this avoids a cycle.
+ */
+export interface ConditionInput {
+  propertyId: number;
+  operatorId: OperatorId;
+  value?: string | number | (string | number)[];
 }

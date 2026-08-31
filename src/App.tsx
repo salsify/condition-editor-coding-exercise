@@ -1,36 +1,34 @@
-import { useMemo, useState } from "react";
-import { useCatalog } from "./api/useCatalog";
+import { useState } from "react";
+import { useReferenceData } from "./api/useReferenceData";
+import { useProducts } from "./api/useProducts";
 import { ConditionEditor } from "./components/ConditionEditor";
 import { ProductList } from "./components/ProductList";
-import type { Operator, Product, Property } from "./api/types";
-import { filterProducts, type Condition } from "./domain/filter";
+import type { Operator, Property } from "./api/types";
+import type { Condition } from "./domain/filter";
 import "./App.css";
 
-// Stable empty-array fallbacks (rather than `[]` literals) so `useMemo`
-// below doesn't see a "new" dependency on every render while loading/erroring.
+// Stable empty-array fallbacks (rather than `[]` literals) so components
+// below don't see "new" props on every render while loading/erroring.
 const NO_PROPERTIES: Property[] = [];
 const NO_OPERATORS: Operator[] = [];
-const NO_PRODUCTS: Product[] = [];
 
 function App() {
-  const catalog = useCatalog();
+  const referenceData = useReferenceData();
   const [condition, setCondition] = useState<Condition | null>(null);
 
+  // The server does the filtering (see `src/mocks/handlers.ts`) — this
+  // just renders whatever the `products` query currently holds for
+  // `condition`. `useProducts` keeps the previous list visible while a
+  // refetch is in flight, so there's no need to gate rendering on its
+  // status the way `referenceData`'s one-time load is gated below.
+  const productsState = useProducts(condition);
+
   const properties =
-    catalog.status === "success" ? catalog.data.properties : NO_PROPERTIES;
+    referenceData.status === "success" ? referenceData.data.properties : NO_PROPERTIES;
   const operators =
-    catalog.status === "success" ? catalog.data.operators : NO_OPERATORS;
-  const products =
-    catalog.status === "success" ? catalog.data.products : NO_PRODUCTS;
+    referenceData.status === "success" ? referenceData.data.operators : NO_OPERATORS;
 
-  // Always call useMemo (even before we know the catalog loaded) so hook
-  // order stays stable across the loading -> success/error transition.
-  const filteredProducts = useMemo(
-    () => filterProducts(products, condition, properties),
-    [products, condition, properties],
-  );
-
-  if (catalog.status === "loading") {
+  if (referenceData.status === "loading") {
     return (
       <main className="app">
         <p role="status">Loading catalog…</p>
@@ -38,10 +36,12 @@ function App() {
     );
   }
 
-  if (catalog.status === "error") {
+  if (referenceData.status === "error") {
     return (
       <main className="app">
-        <p role="alert">Failed to load catalog: {catalog.error.message}</p>
+        <p role="alert">
+          Failed to load catalog: {referenceData.error.message}
+        </p>
       </main>
     );
   }
@@ -56,7 +56,13 @@ function App() {
         onConditionChange={setCondition}
         onClear={() => setCondition(null)}
       />
-      <ProductList products={filteredProducts} properties={properties} />
+      {productsState.status === "error" ? (
+        <p role="alert">
+          Failed to load products: {productsState.error.message}
+        </p>
+      ) : (
+        <ProductList products={productsState.products} properties={properties} />
+      )}
     </main>
   );
 }

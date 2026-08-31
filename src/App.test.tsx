@@ -1,15 +1,34 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { graphql, HttpResponse } from "msw";
 import { describe, expect, it } from "vitest";
 import App from "./App";
+import type { ConditionInput } from "./api/types";
+import { server } from "./mocks/server";
 
 /**
- * These are component/integration tests: `App` renders for real, fetches
- * the catalog through the real `graphql-request` client, and MSW (wired up
- * globally in `setupTests.ts`) intercepts that GraphQL request and returns
- * the mock catalog — nothing about the datastore is stubbed at the React
- * level.
+ * These are component/integration tests: `App` renders for real, and MSW
+ * (wired up globally in `setupTests.ts`) intercepts its `ReferenceData` and
+ * `Products` GraphQL requests — nothing about the datastore or the
+ * filtering logic is stubbed at the React level. Filtering now happens in
+ * the `Products` MSW handler (see `src/mocks/handlers.ts`), not in `App`,
+ * so every assertion below that depends on a filtered result is exercising
+ * a real request/response cycle: changing the condition triggers a new
+ * `Products` request, and what lands on screen is whatever that mocked
+ * response contains — not a client-side computation over an already-fetched
+ * list. Because that's a real (if fast) async round trip, those assertions
+ * `await` via `waitFor` rather than reading the DOM synchronously right
+ * after an interaction.
  */
+
+const FULL_LIST = [
+  "Cell Phone",
+  "Cup",
+  "Hammer",
+  "Headphones",
+  "Key",
+  "Keyboard",
+];
 
 function getProductNames(): string[] {
   const table = screen.getByRole("table");
@@ -17,25 +36,25 @@ function getProductNames(): string[] {
   return rows.map((row) => within(row).getAllByRole("cell")[0].textContent!);
 }
 
+async function expectProductNames(expected: string[]) {
+  const wanted = [...expected].sort();
+  await waitFor(() => {
+    expect(getProductNames().sort()).toEqual(wanted);
+  });
+}
+
 async function waitForCatalog() {
   await screen.findByRole("combobox", { name: "Property" });
+  // The initial (unfiltered) `products` request is separate from
+  // `ReferenceData` and resolves asynchronously too — wait for it so
+  // subsequent assertions aren't racing against an empty/loading table.
+  await expectProductNames(FULL_LIST);
 }
 
 describe("App", () => {
   it("shows every product before any filter is applied", async () => {
     render(<App />);
     await waitForCatalog();
-
-    expect(getProductNames().sort()).toEqual(
-      [
-        "Cell Phone",
-        "Cup",
-        "Hammer",
-        "Headphones",
-        "Key",
-        "Keyboard",
-      ].sort(),
-    );
   });
 
   it("does not filter until the condition is fully set (property only)", async () => {
@@ -49,17 +68,9 @@ describe("App", () => {
     );
 
     // Property selected, but no operator chosen by the user yet (the
-    // default operator is pre-filled with no value) — full list still.
-    expect(getProductNames().sort()).toEqual(
-      [
-        "Cell Phone",
-        "Cup",
-        "Hammer",
-        "Headphones",
-        "Key",
-        "Keyboard",
-      ].sort(),
-    );
+    // default operator is pre-filled with no value) — the condition isn't
+    // complete, so the client doesn't even send it; full list still.
+    await expectProductNames(FULL_LIST);
   });
 
   it("does not filter until a value-requiring operator's value is entered", async () => {
@@ -78,16 +89,7 @@ describe("App", () => {
 
     // Operator needs a value ("Is greater than") but none has been typed
     // yet — still the full list, not an empty (or wrongly filtered) one.
-    expect(getProductNames().sort()).toEqual(
-      [
-        "Cell Phone",
-        "Cup",
-        "Hammer",
-        "Headphones",
-        "Key",
-        "Keyboard",
-      ].sort(),
-    );
+    await expectProductNames(FULL_LIST);
   });
 
   it("filters live as a numeric condition is built (weight > 4)", async () => {
@@ -105,9 +107,7 @@ describe("App", () => {
     );
     await user.type(screen.getByRole("spinbutton", { name: "Value" }), "4");
 
-    expect(getProductNames().sort()).toEqual(
-      ["Hammer", "Headphones", "Keyboard"].sort(),
-    );
+    await expectProductNames(["Hammer", "Headphones", "Keyboard"]);
   });
 
   it("filters using contains, matching the README worked example", async () => {
@@ -125,7 +125,7 @@ describe("App", () => {
     );
     await user.type(screen.getByRole("textbox", { name: "Value" }), "phone");
 
-    expect(getProductNames().sort()).toEqual(["Cell Phone", "Headphones"]);
+    await expectProductNames(["Cell Phone", "Headphones"]);
   });
 
   it("has no value input for 'Has any value' / 'Has no value', and filters correctly", async () => {
@@ -147,16 +147,14 @@ describe("App", () => {
     // input — so there's no orphaned "Value" text left dangling above a
     // hidden input.
     expect(screen.queryByText("Value")).not.toBeInTheDocument();
-    expect(getProductNames().sort()).toEqual(
-      ["Cell Phone", "Headphones", "Keyboard"].sort(),
-    );
+    await expectProductNames(["Cell Phone", "Headphones", "Keyboard"]);
 
     await user.selectOptions(
       screen.getByRole("combobox", { name: "Operator" }),
       "Has no value",
     );
     expect(screen.queryByText("Value")).not.toBeInTheDocument();
-    expect(getProductNames().sort()).toEqual(["Cup", "Hammer", "Key"].sort());
+    await expectProductNames(["Cup", "Hammer", "Key"]);
   });
 
   it("filters an enumerated property with 'Is any of' via a checkbox group", async () => {
@@ -177,7 +175,7 @@ describe("App", () => {
     await user.click(within(group).getByLabelText("tools"));
     await user.click(within(group).getByLabelText("kitchenware"));
 
-    expect(getProductNames().sort()).toEqual(["Cup", "Hammer", "Key"].sort());
+    await expectProductNames(["Cup", "Hammer", "Key"]);
   });
 
   it("only offers operators valid for the selected property's type", async () => {
@@ -219,20 +217,11 @@ describe("App", () => {
       screen.getByRole("textbox", { name: "Value" }),
       "Headphones",
     );
-    expect(getProductNames()).toEqual(["Headphones"]);
+    await expectProductNames(["Headphones"]);
 
     await user.click(screen.getByRole("button", { name: "Clear filter" }));
 
-    expect(getProductNames().sort()).toEqual(
-      [
-        "Cell Phone",
-        "Cup",
-        "Hammer",
-        "Headphones",
-        "Key",
-        "Keyboard",
-      ].sort(),
-    );
+    await expectProductNames(FULL_LIST);
     expect(
       screen.queryByRole("combobox", { name: "Operator" }),
     ).not.toBeInTheDocument();
@@ -263,7 +252,7 @@ describe("App", () => {
     await user.type(valueInput, " Key");
     expect(valueInput).toHaveValue("Headphones, Key");
 
-    expect(getProductNames().sort()).toEqual(["Headphones", "Key"].sort());
+    await expectProductNames(["Headphones", "Key"]);
   });
 
   it("allows typing a comma-separated list into a number 'Is any of' value, including mid-typing commas", async () => {
@@ -288,9 +277,7 @@ describe("App", () => {
     await user.type(valueInput, " 1");
     expect(valueInput).toHaveValue("5, 1");
 
-    expect(getProductNames().sort()).toEqual(
-      ["Headphones", "Keyboard", "Key"].sort(),
-    );
+    await expectProductNames(["Headphones", "Keyboard", "Key"]);
   });
 
   it("resets the 'Is any of' free-text value when switching operators or properties", async () => {
@@ -342,7 +329,7 @@ describe("App", () => {
       screen.getByRole("textbox", { name: "Value" }),
       "Headphones",
     );
-    expect(getProductNames()).toEqual(["Headphones"]);
+    await expectProductNames(["Headphones"]);
 
     // Switching to an operator that still needs a value (but hasn't got
     // one yet) should behave like a partial condition again, not keep
@@ -352,15 +339,48 @@ describe("App", () => {
       "Contains",
     );
 
-    expect(getProductNames().sort()).toEqual(
-      [
-        "Cell Phone",
-        "Cup",
-        "Hammer",
-        "Headphones",
-        "Key",
-        "Keyboard",
-      ].sort(),
+    await expectProductNames(FULL_LIST);
+  });
+
+  it("sends `condition` to the `Products` query only once it's complete, shaped as {propertyId, operatorId, value}", async () => {
+    const seenConditions: (ConditionInput | null | undefined)[] = [];
+    server.use(
+      graphql.query<
+        { products: unknown[] },
+        { condition?: ConditionInput | null }
+      >("Products", ({ variables }) => {
+        seenConditions.push(variables.condition);
+        return HttpResponse.json({ data: { products: [] } });
+      }),
     );
+
+    const user = userEvent.setup();
+    render(<App />);
+    await screen.findByRole("combobox", { name: "Property" });
+    // The initial mount fetch: no condition yet.
+    await waitFor(() => expect(seenConditions).toHaveLength(1));
+    expect(seenConditions[0]).toBeUndefined();
+
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Property" }),
+      "weight (oz)",
+    );
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Operator" }),
+      "Is greater than",
+    );
+    // Property + operator picked, no value yet — must not have triggered
+    // another `Products` request (an incomplete condition is equivalent
+    // to no condition, so there's nothing new to ask the server for).
+    expect(seenConditions).toHaveLength(1);
+
+    await user.type(screen.getByRole("spinbutton", { name: "Value" }), "4");
+
+    await waitFor(() => expect(seenConditions).toHaveLength(2));
+    expect(seenConditions[1]).toEqual({
+      propertyId: 2,
+      operatorId: "greater_than",
+      value: 4,
+    });
   });
 });

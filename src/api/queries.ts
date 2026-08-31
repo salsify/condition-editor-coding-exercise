@@ -1,12 +1,9 @@
 /**
- * A single query fetches the full catalog (properties, operators, and
- * products) once. The dataset is small and static per session — filtering
- * as the user builds a condition happens client-side (see `domain/filter.ts`)
- * rather than round-tripping to the server on every keystroke, matching the
- * spirit of the original in-browser `datastore.js` exercise.
+ * Properties and operators are static reference data for the session —
+ * fetched once, up front, independent of any condition the user builds.
  */
-export const CATALOG_QUERY = /* GraphQL */ `
-  query Catalog {
+export const REFERENCE_DATA_QUERY = /* GraphQL */ `
+  query ReferenceData {
     properties {
       id
       name
@@ -17,7 +14,19 @@ export const CATALOG_QUERY = /* GraphQL */ `
       id
       text
     }
-    products {
+  }
+`;
+
+/**
+ * Products are fetched (and filtered) per the current condition: the
+ * server applies `condition` and returns only matching products. Called
+ * with `condition` omitted/null, it returns the full, unfiltered list —
+ * which is exactly how the client calls it while the condition being built
+ * in the UI isn't complete yet (see `isConditionComplete`).
+ */
+export const PRODUCTS_QUERY = /* GraphQL */ `
+  query Products($condition: ConditionInput) {
+    products(condition: $condition) {
       id
       propertyValues {
         propertyId
