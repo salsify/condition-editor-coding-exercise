@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import type { Product, Property } from "../api/types";
-import { evaluateCondition, filterProducts } from "./filter";
+import {
+  evaluateCondition,
+  filterProducts,
+  isConditionComplete,
+} from "./filter";
 import { mockCatalog } from "../mocks/data";
 
 const { properties, products } = mockCatalog;
@@ -257,6 +261,140 @@ describe("filterProducts", () => {
       "Headphones",
       "Keyboard",
     ]);
+  });
+});
+
+describe("isConditionComplete", () => {
+  it("is false for no condition", () => {
+    expect(isConditionComplete(null)).toBe(false);
+    expect(isConditionComplete(undefined)).toBe(false);
+  });
+
+  it("is false for a property-only condition awaiting a value-requiring operator's value", () => {
+    // Mirrors what ConditionEditor produces right after a property is
+    // selected: propertyId + a default operator, no value yet.
+    expect(
+      isConditionComplete({ propertyId: 0, operatorId: "equals" }),
+    ).toBe(false);
+    expect(
+      isConditionComplete({
+        propertyId: 0,
+        operatorId: "equals",
+        value: undefined,
+      }),
+    ).toBe(false);
+  });
+
+  it("is false for an empty-string value", () => {
+    expect(
+      isConditionComplete({
+        propertyId: 0,
+        operatorId: "contains",
+        value: "",
+      }),
+    ).toBe(false);
+  });
+
+  it("is false for 'in' with no values selected yet", () => {
+    expect(isConditionComplete({ propertyId: 0, operatorId: "in" })).toBe(
+      false,
+    );
+    expect(
+      isConditionComplete({ propertyId: 0, operatorId: "in", value: [] }),
+    ).toBe(false);
+  });
+
+  it("is true for 'any'/'none' as soon as property + operator are set (no value needed)", () => {
+    expect(isConditionComplete({ propertyId: 4, operatorId: "any" })).toBe(
+      true,
+    );
+    expect(isConditionComplete({ propertyId: 4, operatorId: "none" })).toBe(
+      true,
+    );
+  });
+
+  it("is true once a value-requiring operator has a value", () => {
+    expect(
+      isConditionComplete({
+        propertyId: 0,
+        operatorId: "equals",
+        value: "Headphones",
+      }),
+    ).toBe(true);
+    expect(
+      isConditionComplete({
+        propertyId: 2,
+        operatorId: "greater_than",
+        value: 0,
+      }),
+    ).toBe(true); // 0 is a valid, "complete" numeric value
+    expect(
+      isConditionComplete({
+        propertyId: 0,
+        operatorId: "in",
+        value: ["Headphones"],
+      }),
+    ).toBe(true);
+  });
+});
+
+describe("filterProducts (condition completeness)", () => {
+  it("shows the full list when only a property is selected (no operator picked yet)", () => {
+    const condition = { propertyId: 0, operatorId: "equals" as const };
+    expect(filterProducts(products, condition, properties)).toEqual(products);
+  });
+
+  it("shows the full list while a value-requiring operator is missing its value", () => {
+    const conditions = [
+      { propertyId: 0, operatorId: "equals" as const },
+      { propertyId: 0, operatorId: "contains" as const, value: "" },
+      { propertyId: 2, operatorId: "greater_than" as const },
+      { propertyId: 2, operatorId: "less_than" as const },
+      { propertyId: 0, operatorId: "in" as const, value: [] },
+    ];
+    for (const condition of conditions) {
+      expect(filterProducts(products, condition, properties)).toEqual(
+        products,
+      );
+    }
+  });
+
+  it("filters immediately for 'any'/'none' once property + operator are set", () => {
+    const anyCondition = { propertyId: 4, operatorId: "any" as const };
+    const result = filterProducts(products, anyCondition, properties);
+    expect(result.map(nameOf).sort()).toEqual([
+      "Cell Phone",
+      "Headphones",
+      "Keyboard",
+    ]);
+  });
+
+  it("filters once the condition becomes fully set (property + operator + value)", () => {
+    const condition = {
+      propertyId: 0,
+      operatorId: "equals" as const,
+      value: "Headphones",
+    };
+    const result = filterProducts(products, condition, properties);
+    expect(result.map(nameOf)).toEqual(["Headphones"]);
+  });
+
+  it("restores the full list when a fully-set condition is cleared back to incomplete", () => {
+    const complete = {
+      propertyId: 0,
+      operatorId: "equals" as const,
+      value: "Headphones",
+    };
+    expect(filterProducts(products, complete, properties).map(nameOf)).toEqual(
+      ["Headphones"],
+    );
+
+    // Clearing the operator (as ConditionEditor's operator reset does)
+    // drops the value too, going back to an incomplete condition.
+    const clearedOperator = { propertyId: 0, operatorId: "equals" as const };
+    expect(
+      filterProducts(products, clearedOperator, properties),
+    ).toEqual(products);
   });
 });
 

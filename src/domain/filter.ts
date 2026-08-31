@@ -1,4 +1,5 @@
 import type { OperatorId, Product, Property } from "../api/types";
+import { operatorTakesMultipleValues, operatorTakesValue } from "./operators";
 
 export type ConditionValue = string | number | (string | number)[] | undefined;
 
@@ -83,9 +84,33 @@ export function evaluateCondition(
 }
 
 /**
+ * Whether `condition` has everything it needs to actually filter with:
+ * a property, an operator, and — for operators that take one (everything
+ * but `any`/`none`) — a value. Used to hold off filtering (showing the
+ * full list instead) while the user is still mid-way through building a
+ * condition, e.g. right after picking a property but before an operator
+ * needing a value has one entered.
+ */
+export function isConditionComplete(
+  condition: Condition | null | undefined,
+): boolean {
+  if (!condition) return false;
+  if (!operatorTakesValue(condition.operatorId)) return true;
+
+  if (operatorTakesMultipleValues(condition.operatorId)) {
+    return Array.isArray(condition.value) && condition.value.length > 0;
+  }
+
+  if (condition.value === undefined) return false;
+  if (typeof condition.value === "string") return condition.value.length > 0;
+  return true;
+}
+
+/**
  * Filters `products` down to those matching `condition`, or returns them
- * unchanged when there is no condition (the "clear filter" state) or the
- * condition's property can't be resolved.
+ * unchanged when there is no condition (the "clear filter" state), the
+ * condition isn't complete enough to evaluate yet (see
+ * `isConditionComplete`), or the condition's property can't be resolved.
  */
 export function filterProducts(
   products: Product[],
@@ -93,6 +118,7 @@ export function filterProducts(
   properties: Property[],
 ): Product[] {
   if (!condition) return products;
+  if (!isConditionComplete(condition)) return products;
   const property = properties.find((p) => p.id === condition.propertyId);
   if (!property) return products;
   return products.filter((product) =>

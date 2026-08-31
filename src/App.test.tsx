@@ -38,6 +38,58 @@ describe("App", () => {
     );
   });
 
+  it("does not filter until the condition is fully set (property only)", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await waitForCatalog();
+
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Property" }),
+      "weight (oz)",
+    );
+
+    // Property selected, but no operator chosen by the user yet (the
+    // default operator is pre-filled with no value) — full list still.
+    expect(getProductNames().sort()).toEqual(
+      [
+        "Cell Phone",
+        "Cup",
+        "Hammer",
+        "Headphones",
+        "Key",
+        "Keyboard",
+      ].sort(),
+    );
+  });
+
+  it("does not filter until a value-requiring operator's value is entered", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await waitForCatalog();
+
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Property" }),
+      "weight (oz)",
+    );
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Operator" }),
+      "Is greater than",
+    );
+
+    // Operator needs a value ("Is greater than") but none has been typed
+    // yet — still the full list, not an empty (or wrongly filtered) one.
+    expect(getProductNames().sort()).toEqual(
+      [
+        "Cell Phone",
+        "Cup",
+        "Hammer",
+        "Headphones",
+        "Key",
+        "Keyboard",
+      ].sort(),
+    );
+  });
+
   it("filters live as a numeric condition is built (weight > 4)", async () => {
     const user = userEvent.setup();
     render(<App />);
@@ -179,5 +231,44 @@ describe("App", () => {
     expect(
       screen.queryByRole("combobox", { name: "Operator" }),
     ).not.toBeInTheDocument();
+  });
+
+  it("restores the full list when a completed condition is changed back to an incomplete one", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await waitForCatalog();
+
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Property" }),
+      "Product Name",
+    );
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Operator" }),
+      "Equals",
+    );
+    await user.type(
+      screen.getByRole("textbox", { name: "Value" }),
+      "Headphones",
+    );
+    expect(getProductNames()).toEqual(["Headphones"]);
+
+    // Switching to an operator that still needs a value (but hasn't got
+    // one yet) should behave like a partial condition again, not keep
+    // the previous filtered result around.
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Operator" }),
+      "Contains",
+    );
+
+    expect(getProductNames().sort()).toEqual(
+      [
+        "Cell Phone",
+        "Cup",
+        "Hammer",
+        "Headphones",
+        "Key",
+        "Keyboard",
+      ].sort(),
+    );
   });
 });
