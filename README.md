@@ -1,78 +1,49 @@
-# Product Filtering Condition Editor UI
-A Coding Exercise for UI Developers
+# Product Filtering Condition Editor
 
-# Introduction
+This is a live pairing exercise built around a working product-filtering app: a small React/TypeScript app that lets a user filter a product catalog, backed by a mocked GraphQL API.
 
-Many capabilities of Salsify are built around filtered sets of products. Products at Salsify consist of properties and their values. Properties have a datatype.
+## How this codebase works
 
-In order to create filtered sets of products in Salsify we created a condition editor. This editor is used to build a filter that Salsify applies to the full set of products. The resulting set of products, presented as a list, is updated as filters are added or changed.
+### What it does
 
-In order to create a filter users must choose a property, an operator, and one or more values. Due to the differences in property datatypes, not all operators apply to all properties.
+The app renders a product catalog table alongside a condition editor: pick a property (e.g. `weight`, `color`), pick an operator valid for that property's type (e.g. `greater_than`, `contains`, `any`), and, if the operator needs one, a value. As soon as the condition is complete, the product list updates to show only the matching products. Properties, operators, and products all come from a mocked GraphQL API (via [MSW](https://mswjs.io/)) rather than being hardcoded, so the UI is data-driven: it doesn't assume a fixed set of properties or property types.
 
-To complete this exercise please build a user interface to create a filter and update a list of products to reflect the results. Use the exercise to demonstrate not only a solution to the problem but your approach to software design and testing.
+### Running it
 
-Provide us with an archive containing the results of your work and a README file with a guided tour of your work, notes on your development process, how long you spent on the exercise, what assumptions you made, etc.  If you wish, this may also be presented as a live site.  In that case simply provide a link to the site and the README file mentioned above.
+```sh
+npm install
+npm run dev         # http://localhost:5173, MSW mocks the GraphQL API in the browser
+npm run test        # Vitest + React Testing Library, MSW-mocked
+npm run test:watch  # same, in watch mode
+npm run typecheck   # tsc -b, no emit
+npm run lint        # oxlint
+npm run build       # tsc -b && vite build, production bundle in dist/
+```
 
-# Specification
+### High-level structure
 
-This repository contains a mock `datastore` which includes sample products, property definitions including data types, and the complete set of filter operator. Using this datastore please create a web user interface with the following behavior:
+- **`src/App.tsx`**: top-level component. Fetches reference data once on mount, holds the current condition in React state, and renders whatever the products query currently returns. It doesn't filter anything itself.
+- **`src/api/`**: the GraphQL client layer: types (`types.ts`), the two queries the app makes, `ReferenceData` and `Products($condition)` (`queries.ts`), a thin `graphql-request` client (`client.ts`), and the hooks that call them (`useReferenceData.ts`, `useProducts.ts`).
+- **`src/domain/`**: pure, framework-free filtering logic (`filter.ts`, `operators.ts`): given a condition and a product, does it match? What operators are valid for a given property type? No React, no network, just functions and their unit tests.
+- **`src/mocks/`**: the mocked backend. `data.ts` holds the reimplemented dataset; `handlers.ts` defines the MSW GraphQL handlers that resolve `ReferenceData` and `Products`, and this is where `src/domain`'s filtering logic actually gets called today. `browser.ts` / `server.ts` wire the same handlers into the dev server and the test suite, respectively.
+- **`src/components/`**: `ConditionEditor` (property/operator/value selection), `ValueInput` (the right input widget for a given property type and operator), `ProductList` (renders the current product list).
 
-* A user can create a single filter
-* Filters have the form `[property] [operator] [property value]`
-* Creating or updating a filter causes the the list of products to update
-* A user can clear the filter to see all products
+This is a boundary worth understanding before making changes: filtering doesn't happen in the browser, it happens in the mocked GraphQL server (`src/mocks/handlers.ts`), which calls into `src/domain`. The client just sends a condition and renders whatever comes back.
 
-Included are [wireframes](http://salsify.github.io/condition-editor-coding-exercise/docs/wireframe.pdf) to illustrate a potential implementation. Feel free to approach this solution in the manner you see fit, but keep in mind we will evaluate your submission more on software design than user experience.
+### Data flow through a typical request
 
-# Tips and Recommendations
-- No other Operators or data types will be introduced; they are static.
-- Properties and Products vary from customer to customer, you cannot depend on having the same properties or products available each time this application loads
+When a user finishes building a condition in `ConditionEditor`, `App` updates its `condition` state, which `useProducts` picks up and sends as the `condition` variable on a `Products` GraphQL request. MSW intercepts that request by operation name in `src/mocks/handlers.ts`, which calls `filterProducts` against the mock dataset and the given condition, and returns the matching products as the mocked response. `useProducts` exposes that result, and `App` passes it to `ProductList`, which renders the updated table.
 
-## Properties Types/Operators
+### Tests
 
-Operators define the relationship between properties and property values. Certain operators are only valid for certain property types. The behavior of each operator and the valid operators for each property type are defined as follows:
+Colocated next to the code they cover:
+- `src/domain/filter.test.ts` and `operators.test.ts`: unit tests of the pure filtering/validity logic.
+- `src/App.test.tsx`: integration tests rendering the real `App` through the real hooks and real MSW handlers, asserting on rendered output and on the requests MSW actually receives.
 
-| Operator | Description |
------------|--------------
-| Equals   | Value exactly matches |
-| Is greater than | Value is greater than |
-| Is less than  | Value is less than |
-| Has any value | Value is present |
-| Has no value  | Value is absent  |
-| Is any of     | Value exactly matches one of several values |
-| Contains      | Value contains the specified text |
+## Your task
 
+Users have told us that filtering by a single condition isn't enough for real-world catalogs. Your task in this session is to address that gap in this codebase. How you approach it, what changes, how much, and where, is up to you; we're interested in how you think through it, not in matching a particular answer.
 
-| Property Type | Valid Operators |
----------------- | ----------------
-| string | Equals |
-| | Has any value |
-| | Has no value |
-| | Is any of |
-| | Contains |
-| number | Equals |
-| | Is greater than |
-| | Is less than |
-| | Has any value |
-| | Has no value |
-| | Is any of |
-| enumerated | equals |
-| | Has any value |
-| | Has no value |
-| | Is any of |
+## Using AI
 
-### Examples
-
-Here are some example property & input combinations and a description of their expected output. This table is meant to further clarify the expected behavior of the aforementioned operators.
-
-| Operator | Example Property | Example Value | Expected Output |
-| -------- | ---------------- | ------------------- | --------------- |
-| Equals | `Name` | `Headphones` | Products where `Name` is exactly `Headphones` |
-| Is greater than | `Price` | `20` | Products where the `Price` > `20` |
-| Is less than | `Price` | `20` | Products where `Price` < `20` |
-| Has any value | `Description` | --- | Products where `Description` is defined/is NOT null |
-| Has no value | `Description` | --- | Products where the `Description` is not defined/IS null |
-| Is any of | `Name` | `Headphones, Keys` | Products where the Name is either exactly `Headphones` OR exactly `Keys` |
-| Contains | `Name` | `phone` | Products where the Name string CONTAINS `phone` (e.g. `Headphones`, `Telephone`, `Cell Phone`, `Phone`) |
-
-
+You're encouraged to use AI assistance during this exercise. Just make sure your screen is shared for the full session, including any prompts you type into an AI tool, so we can follow your thinking as you go.

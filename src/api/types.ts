@@ -1,0 +1,75 @@
+/**
+ * Types describing the shape of data returned by the mocked GraphQL API.
+ * These mirror the original `datastore.js` dataset (see
+ * `reference/datastore.js`), reimplemented behind a GraphQL layer.
+ */
+
+export type PropertyType = "string" | "number" | "enumerated";
+
+export interface Property {
+  id: number;
+  name: string;
+  type: PropertyType;
+  /** Only present (and only meaningful) for `type: "enumerated"`. */
+  values?: string[];
+}
+
+export interface PropertyValue {
+  propertyId: number;
+  /** Numeric properties carry a number; string/enumerated carry a string. */
+  value: string | number;
+}
+
+export interface Product {
+  id: number;
+  /**
+   * Sparse by design: a product may omit a `PropertyValue` entirely for a
+   * given property (see products 3-5 in the mock dataset), which is what
+   * makes the `any` ("has any value") / `none` ("has no value") operators
+   * meaningful.
+   */
+  propertyValues: PropertyValue[];
+}
+
+export type OperatorId =
+  | "equals"
+  | "greater_than"
+  | "less_than"
+  | "any"
+  | "none"
+  | "in"
+  | "contains";
+
+export interface Operator {
+  id: OperatorId;
+  text: string;
+}
+
+/**
+ * The shape of the mock dataset in `src/mocks/data.ts` — no longer what a
+ * single query returns (see `ReferenceData` and the `products` query
+ * below), just a convenient bundle the MSW handlers slice per-operation.
+ */
+export interface CatalogData {
+  properties: Property[];
+  operators: Operator[];
+  products: Product[];
+}
+
+/** What the `ReferenceData` query returns: static, fetched once. */
+export interface ReferenceData {
+  properties: Property[];
+  operators: Operator[];
+}
+
+/**
+ * The `condition` variable for the `products(condition: ConditionInput)`
+ * query — structurally the same shape as `domain/filter`'s `Condition`,
+ * kept as an independent type here (rather than imported) since `domain/`
+ * already imports from `api/types` and this avoids a cycle.
+ */
+export interface ConditionInput {
+  propertyId: number;
+  operatorId: OperatorId;
+  value?: string | number | (string | number)[];
+}
