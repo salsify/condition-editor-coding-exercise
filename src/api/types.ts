@@ -1,8 +1,7 @@
 /**
  * Types describing the shape of data returned by the mocked GraphQL API.
- * These mirror `reference/schema.graphql` and, in turn, the original
- * `datastore.js` dataset (see `reference/datastore.js`), reimplemented
- * behind a GraphQL layer per the exercise instructions.
+ * These mirror the original `datastore.js` dataset (see
+ * `reference/datastore.js`), reimplemented behind a GraphQL layer.
  */
 
 export type PropertyType = "string" | "number" | "enumerated";

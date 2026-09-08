@@ -51,7 +51,7 @@ export function evaluateCondition(
 
     case "contains": {
       if (raw === undefined || condition.value === undefined) return false;
-      // Case-insensitive substring match — see SOLUTION.md "Assumptions".
+      // Case-insensitive substring match.
       return String(raw)
         .toLowerCase()
         .includes(String(condition.value).toLowerCase());

@@ -1,7 +1,7 @@
 import type { OperatorId, PropertyType } from "../api/types";
 
 /**
- * The validity matrix from the exercise README:
+ * The operator validity matrix:
  *
  * | Property Type | Valid Operators                                  |
  * | -------------- | ------------------------------------------------- |
