@@ -1,6 +1,6 @@
 # Product Filtering Condition Editor
 
-This is a live pairing exercise built around a working product-filtering app: a small React/TypeScript app that lets a user filter a product catalog by a single condition, backed by a mocked GraphQL API.
+This is a live pairing exercise built around a working product-filtering app: a small React/TypeScript app that lets a user filter a product catalog, backed by a mocked GraphQL API.
 
 ## How this codebase works
 
